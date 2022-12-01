@@ -1,9 +1,9 @@
 package Game;
 
 import Protocol.Protocol;
+import Protocol.Message;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class GameServer implements Runnable {
@@ -17,22 +17,32 @@ public class GameServer implements Runnable {
 
   @Override
   public void run() {
+    System.out.println("Connected");
+
     try {
-      DataInputStream in = new DataInputStream(client.getInputStream());
-      DataOutputStream out = new DataOutputStream(client.getOutputStream());
+
+      ObjectInputStream in = new ObjectInputStream(client.getInputStream());
+      ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
+      System.out.println(client.getInputStream());
+
       while (true) {
-        String message = in.readUTF();
+        Message message = (Message) in.readObject();
+        System.out.println(message.getAction());
         try {
-          String response = protocol.processLine(message);
-          out.writeUTF(response);
+          Message response = protocol.processLine(message);
+          System.out.println("response: " + response.getCodeSession());
+          out.writeObject(response);
           if (response.equals("BYE")) break;
         } catch (Exception ignore) {
           // break;
+          System.out.println(ignore);
         }
       }
       in.close();
       out.close();
       client.close();
-    } catch (Exception ignore) {}
+    } catch (Exception ignore) {
+
+    }
   }
 }

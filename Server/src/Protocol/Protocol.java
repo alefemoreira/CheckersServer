@@ -18,19 +18,20 @@ public class Protocol {
     this.socket = socket;
   }
 
-  public String processLine(String message)
+  public Message processLine(Message message)
     throws IllegalArgumentException, InvalidSession, NonExistentPiece
   {
-    if (message.length() == 0) throw new IllegalArgumentException();
+    if (message.getAction().length() == 0) throw new IllegalArgumentException();
 
-    String[] data = message.split(" ");
+//    String[] data = message.split(" ");
 
-    switch (data[0]) {
+    switch (message.getAction()) {
       case "CREATE_SESSION":
         Color color = Color.WHITE;
 
-        if (data[1].equals("BLACK"))
-          color = Color.BLACK;
+
+//        if (message.getColor().equals("BLACK"))
+//          color = Color.BLACK;
 
         this.session = Session.create(socket, color);
 
@@ -43,42 +44,48 @@ public class Protocol {
 
         Session.printSessions();
         Session.add(code, this.session);
-        return "OK " + code;
+
+        Message msgResponse = new Message();
+        msgResponse.setCodeSession(code);
+        msgResponse.setColor("WHITE");
+
+        return msgResponse;
       case "QUIT_SESSION":
         if (this.session != null) {
           try {
             this.session.close();
           } catch (Exception ignore) {}
         }
-        return "BYE";
-      case "BYE":
-        return "BYE";
-      case "CONNECT_SESSION":
-        this.session = Session.find(data[1]);
-        this.session.addPlayer2(this.socket);
-        break;
-      case "MOVE":
-        int pieceId = Integer.parseInt(data[2]);
-        Player player;
-
-        if (this.socket.equals(this.session.getPlayer1().getSocket())) {
-          player = this.session.getPlayer1();
-        } else if (this.socket.equals(this.session.getPlayer2().getSocket())) {
-          player = this.session.getPlayer2();
-        } else {
-          throw new InvalidSession();
-        }
-
-        int x = Integer.parseInt(data[3]);
-        int y = Integer.parseInt(data[4]);
-        Piece piece = this.session.getTable().getPieceById(pieceId);
-        if (piece == null) throw new NonExistentPiece();
-        this.session.move(player, piece, x, y);
-        break;
+        Message msgQuit = new Message();
+        msgQuit.setAction("QUIT");
+        return msgQuit;
+//      case "BYE":
+//        return "BYE";
+//      case "CONNECT_SESSION":
+//        this.session = Session.find(data[1]);
+//        this.session.addPlayer2(this.socket);
+//        break;
+//      case "MOVE":
+//        int pieceId = Integer.parseInt(data[2]);
+//        Player player;
+//
+//        if (this.socket.equals(this.session.getPlayer1().getSocket())) {
+//          player = this.session.getPlayer1();
+//        } else if (this.socket.equals(this.session.getPlayer2().getSocket())) {
+//          player = this.session.getPlayer2();
+//        } else {
+//          throw new InvalidSession();
+//        }
+//
+//        int x = Integer.parseInt(data[3]);
+//        int y = Integer.parseInt(data[4]);
+//        Piece piece = this.session.getTable().getPieceById(pieceId);
+//        if (piece == null) throw new NonExistentPiece();
+//        this.session.move(player, piece, x, y);
+//        break;
       default:
         throw new IllegalArgumentException();
     }
 
-    return "OK";
   }
 }
