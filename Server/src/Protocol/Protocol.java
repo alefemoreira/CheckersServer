@@ -59,12 +59,20 @@ public class Protocol {
         Message msgQuit = new Message();
         msgQuit.setAction("QUIT");
         return msgQuit;
-//      case "BYE":
-//        return "BYE";
-//      case "CONNECT_SESSION":
-//        this.session = Session.find(data[1]);
-//        this.session.addPlayer2(this.socket);
-//        break;
+      case "CONNECT_SESSION":
+        this.session = Session.find(message.getCodeSession());
+        this.session.addPlayer2(this.socket);
+        Message msgResponseConnect = new Message();
+        msgResponseConnect.setAction("Start");
+        msgResponseConnect.setColor("BLACK");
+
+
+        System.out.println(this.session.getPlayer1());
+        System.out.println(this.session.getPlayer2());
+
+
+
+        return msgResponseConnect;
 //      case "MOVE":
 //        int pieceId = Integer.parseInt(data[2]);
 //        Player player;
