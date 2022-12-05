@@ -3,7 +3,9 @@ package Game;
 import Pieces.Color;
 import Pieces.Piece;
 
-public class Square {
+import java.io.Serializable;
+
+public class Square implements Serializable {
 
   private int x;
   private int y;

@@ -5,6 +5,7 @@ import java.util.Random;
 import Exceptions.NonExistentPiece;
 import Game.Player;
 import Game.Session;
+import Game.Table;
 import Pieces.Color;
 import Pieces.Piece;
 
@@ -13,6 +14,7 @@ import java.net.Socket;
 public class Protocol {
   private Socket socket;
   private Session session;
+
 
   public Protocol(Socket socket) {
     this.socket = socket;
@@ -87,8 +89,11 @@ public class Protocol {
 
 //        Piece piece = this.session.getTable().getPieceById(pieceId);
 //        if (piece == null) throw new NonExistentPiece();
-        this.session.move(player, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
-        return message;
+        Table table = this.session.move(player, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
+        System.out.println(table);
+        Message msgMoveResponse = new Message();
+        msgMoveResponse.setTable(table);
+        return msgMoveResponse;
 
       default:
       throw new IllegalArgumentException();

@@ -3,9 +3,10 @@ package Pieces;
 import Game.Square;
 import Game.Table;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Piece {
+public abstract class Piece implements Serializable {
   protected Square casa;
   protected Square casaDeCaptura;
   protected int moves;

@@ -3,7 +3,9 @@ package Pieces;
 import Game.Square;
 import Game.Table;
 
-public class Pawn extends Piece {
+import java.io.Serializable;
+
+public class Pawn extends Piece implements Serializable {
   public int deltaMovement;
   public int deltaStole; // ATENÇÃO WEVERTON
   public int promoteOnY; // ATENÇÃO WEVERTON

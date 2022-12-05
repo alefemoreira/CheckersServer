@@ -4,10 +4,11 @@ import Pieces.Color;
 import Pieces.Dame;
 import Pieces.Piece;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class Table {
+public class Table implements Serializable {
   private Piece[][] table;
   private Square[][] squares;
   private Hashtable<Integer, Piece> pieces = new Hashtable<>();
