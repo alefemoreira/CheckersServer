@@ -61,8 +61,11 @@ public class Session {
     this.player2.getSocket().close();
   }
 
-  public void move(Player player, Piece piece, int x, int y) {
-
+  public void move(Player player, int origemX, int origemY, int destinoX, int destinoY) {
+    System.out.println(origemX);
+    System.out.println(origemY);
+    System.out.println(destinoX);
+    System.out.println(destinoY);
   }
 
   public Player getPlayer1() {

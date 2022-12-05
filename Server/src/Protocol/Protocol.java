@@ -73,26 +73,25 @@ public class Protocol {
 
 
         return msgResponseConnect;
-//      case "MOVE":
+      case "MOVE":
 //        int pieceId = Integer.parseInt(data[2]);
-//        Player player;
-//
-//        if (this.socket.equals(this.session.getPlayer1().getSocket())) {
-//          player = this.session.getPlayer1();
-//        } else if (this.socket.equals(this.session.getPlayer2().getSocket())) {
-//          player = this.session.getPlayer2();
-//        } else {
-//          throw new InvalidSession();
-//        }
-//
-//        int x = Integer.parseInt(data[3]);
-//        int y = Integer.parseInt(data[4]);
+        Player player;
+
+        if (this.socket.equals(this.session.getPlayer1().getSocket())) {
+          player = this.session.getPlayer1();
+        } else if (this.socket.equals(this.session.getPlayer2().getSocket())) {
+          player = this.session.getPlayer2();
+        } else {
+          throw new InvalidSession();
+        }
+
 //        Piece piece = this.session.getTable().getPieceById(pieceId);
 //        if (piece == null) throw new NonExistentPiece();
-//        this.session.move(player, piece, x, y);
-//        break;
+        this.session.move(player, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
+        return message;
+
       default:
-        throw new IllegalArgumentException();
+      throw new IllegalArgumentException();
     }
 
   }
