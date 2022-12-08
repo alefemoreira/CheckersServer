@@ -6,10 +6,13 @@ import Pieces.Piece;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class Session {
   private static final Hashtable<String, Session> sessions = new Hashtable<>();
@@ -19,24 +22,33 @@ public class Session {
   private Player player1, player2;
   private Table table;
 
-  private Session (Socket socket, Color player1Color) {
-    this.player1 = new Player(player1Color, socket);
+  private boolean blackRound = false;
+
+
+  public Semaphore wait;
+  public Semaphore wait2;
+
+  private Session (Socket socket, Color player1Color,  ObjectOutputStream out, ObjectInputStream in) throws IOException {
+    this.player1 = new Player(player1Color, socket, out, in);
 
     // Create table
-    this.table = new Table();
+    this.table = new Table(false); // Começa com o turno das brancas
     this.criarPecas();
+
+    this.wait = new Semaphore(0, true);
+    this.wait2 = new Semaphore(0, true);
   }
 
-  public static Session create(Socket socket, Color player1Color) {
-    return new Session(socket, player1Color);
+  public static Session create(Socket socket, Color player1Color, ObjectOutputStream out, ObjectInputStream in) throws IOException {
+    return new Session(socket, player1Color, out, in);
   }
 
-  public void addPlayer2(Socket socket) {
+  public void addPlayer2(Socket socket,  ObjectOutputStream out, ObjectInputStream in) throws IOException {
     Color color = Color.BLACK;
     if (player1.getColor() == Color.BLACK)
       color = Color.WHITE;
 
-    this.player2 = new Player(color, socket);
+    this.player2 = new Player(color, socket, out, in);
   }
 
   public static void printSessions() {
@@ -131,5 +143,22 @@ public class Session {
 
   public Table getTable() {
     return table;
+  }
+
+  public Semaphore getWait() {
+    return wait;
+  }
+
+  public Semaphore getWait2() {
+    return wait2;
+  }
+
+  public boolean isBlackRound() {
+    return blackRound;
+  }
+
+  public void setBlackRound(boolean blackRound) {
+    this.blackRound = blackRound;
+    System.out.println(this.blackRound);
   }
 }

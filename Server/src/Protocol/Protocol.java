@@ -1,11 +1,13 @@
 package Protocol;
 
 import Exceptions.InvalidSession;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Random;
 import Exceptions.NonExistentPiece;
-import Game.Player;
-import Game.Session;
-import Game.Table;
+import Game.*;
 import Pieces.Color;
 import Pieces.Piece;
 
@@ -20,9 +22,8 @@ public class Protocol {
     this.socket = socket;
   }
 
-  public Message processLine(Message message)
-    throws IllegalArgumentException, InvalidSession, NonExistentPiece
-  {
+  public Message processLine(Message message, ObjectOutputStream out, ObjectInputStream in)
+          throws IllegalArgumentException, InvalidSession, NonExistentPiece, IOException, InterruptedException {
     if (message.getAction().length() == 0) throw new IllegalArgumentException();
 
 //    String[] data = message.split(" ");
@@ -35,7 +36,7 @@ public class Protocol {
 //        if (message.getColor().equals("BLACK"))
 //          color = Color.BLACK;
 
-        this.session = Session.create(socket, color);
+        this.session = Session.create(socket, color, out, in);
 
         // gera um código aleatório;
         Random rd = new Random();
@@ -63,36 +64,84 @@ public class Protocol {
         return msgQuit;
       case "CONNECT_SESSION":
         this.session = Session.find(message.getCodeSession());
-        this.session.addPlayer2(this.socket);
+        this.session.addPlayer2(this.socket, out, in);
         Message msgResponseConnect = new Message();
         msgResponseConnect.setAction("Start");
         msgResponseConnect.setColor("BLACK");
+        msgResponseConnect.setCodeSession(message.getCodeSession());
 
 
         System.out.println(this.session.getPlayer1());
         System.out.println(this.session.getPlayer2());
 
 
-
         return msgResponseConnect;
+
+      case "WAIT_MOVE":
+//        this.session.getWait2().acquire();
+        while (this.session.isBlackRound() && message.getColor().equals("WHITE") || !this.session.isBlackRound() && message.getColor().equals("BLACK")){
+          System.out.println("waiting...");
+        }
+
+        System.out.println("Entregando tabuleiro");
+        this.session = Session.find(message.getCodeSession());
+        Message msgMoveResponseWait = new Message();
+        Table tableWait = this.session.getTable();
+        msgMoveResponseWait.setTable(tableWait);
+//        this.session.wait.release();
+
+          return msgMoveResponseWait;
+
       case "MOVE":
+//        this.session.wait.acquire();
 //        int pieceId = Integer.parseInt(data[2]);
-        Player player;
+
+        System.out.println("Vez do preto:" + this.session.isBlackRound());
+
+        if (this.session.isBlackRound() && message.getColor().equals("WHITE") || !this.session.isBlackRound() && message.getColor().equals("BLACK")) {
+          Message msgMoveResponse = new Message();
+          msgMoveResponse.setAction("WRONG_TURN");
+          return msgMoveResponse;
+        }
+
+        Player player1;
+        Player player2;
 
         if (this.socket.equals(this.session.getPlayer1().getSocket())) {
-          player = this.session.getPlayer1();
+          player1 = this.session.getPlayer1();
+          player2 = this.session.getPlayer2();
         } else if (this.socket.equals(this.session.getPlayer2().getSocket())) {
-          player = this.session.getPlayer2();
+          player1 = this.session.getPlayer2();
+          player2 = this.session.getPlayer1();
         } else {
           throw new InvalidSession();
         }
 
-//        Piece piece = this.session.getTable().getPieceById(pieceId);
-//        if (piece == null) throw new NonExistentPiece();
-        Table table = this.session.move(player, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
-        System.out.println(table);
+        System.out.println( message.getOrigemX() + " " + message.getOrigemY() + " " + message.getDestinoX() + " " + message.getDestinoY());
+
+        // Movendo o tabuleiro do servidor
+        Table table = this.session.move(player1, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
+
+        // Messangem de retorno para os clientes
         Message msgMoveResponse = new Message();
+        msgMoveResponse.setAction("SUCCESS_MOVE");
         msgMoveResponse.setTable(table);
+        msgMoveResponse.setSquare(table.getSquare(message.getDestinoX(), message.getDestinoY()));
+
+        // Notificando o outro player sobre a jogada
+        ObjectOutputStream out2 = player2.getOut();
+        out2.writeObject(msgMoveResponse);
+        player2.getOut().reset();
+
+        // Nofificando o player que fez a jogada
+        System.out.println(table);
+//        this.session.wait.release();
+
+//        this.session.getWait2().release();
+
+        // Mudando o turno
+        this.session.setBlackRound(!this.session.isBlackRound());
+
         return msgMoveResponse;
 
       default:

@@ -12,7 +12,7 @@ public class Main {
   HashMap<String, Session> sessions;
 
   public static void main(String[] args) throws IOException {
-      ServerSocket socket = new ServerSocket(54323);
+      ServerSocket socket = new ServerSocket(8888);
       ExecutorService pool = Executors.newCachedThreadPool();
 
       while (true) {

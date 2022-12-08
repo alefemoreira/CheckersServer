@@ -28,6 +28,8 @@ public abstract class Piece implements Serializable {
    * @param destino nova casa que ira conter esta peca.
    */
   public void mover(Square destino, Table tabuleiro) {
+
+    System.out.println(this.couldMove(destino, tabuleiro));
     if(this.couldMove(destino, tabuleiro)) {
       if (this.podeCapturar(destino, tabuleiro)) {
         this.capturar(destino, tabuleiro);
@@ -115,13 +117,13 @@ public abstract class Piece implements Serializable {
 
     if (Math.abs(deltaX) != Math.abs(deltaY)) return false;
     // Verificando se outra peça fez um movimento de captura e tem que se mover de novo
-    if (!moveAndCapture) {
-      if (pecaIsBlack && table.isBlackRound()) {
-        System.out.println("Apenas a peça vermelha que fez a captura pode se mover");
-      } else if (!pecaIsBlack && !table.isBlackRound()){
-        System.out.println("Apenas a peça branca que fez a captura pode se mover");
-      }
-    }
+//    if (!moveAndCapture) {
+//      if (pecaIsBlack && table.isBlackRound()) {
+//        System.out.println("Apenas a peça vermelha que fez a captura pode se mover");
+//      } else if (!pecaIsBlack && !table.isBlackRound()){
+//        System.out.println("Apenas a peça branca que fez a captura pode se mover");
+//      }
+//    }
 
     if (moveAndCapture) {
       if(Math.abs(deltaX) < this.getDeltaDeCaptura() && Math.abs(deltaY) < this.getDeltaDeCaptura()) {

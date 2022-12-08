@@ -10,6 +10,8 @@ public class GameServer implements Runnable {
   private Socket client;
   private Protocol protocol;
 
+
+
   public GameServer(Socket client) {
     this.client = client;
     this.protocol = new Protocol(client);
@@ -29,9 +31,10 @@ public class GameServer implements Runnable {
         Message message = (Message) in.readObject();
         System.out.println(message.getAction());
         try {
-          Message response = protocol.processLine(message);
-          System.out.println("response: " + response.getCodeSession());
+          Message response = protocol.processLine(message, out, in);
+          System.out.println("sala: " + response.getCodeSession() + " " + response.getAction() +  " " + response.getTable());
           out.writeObject(response);
+          out.reset();
           if (response.equals("BYE")) break;
         } catch (Exception ignore) {
           // break;
@@ -45,4 +48,6 @@ public class GameServer implements Runnable {
 
     }
   }
+
+
 }
