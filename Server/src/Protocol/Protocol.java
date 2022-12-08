@@ -66,13 +66,18 @@ public class Protocol {
         this.session = Session.find(message.getCodeSession());
         this.session.addPlayer2(this.socket, out, in);
         Message msgResponseConnect = new Message();
-        msgResponseConnect.setAction("Start");
+        msgResponseConnect.setAction("START");
         msgResponseConnect.setColor("BLACK");
         msgResponseConnect.setCodeSession(message.getCodeSession());
 
 
         System.out.println(this.session.getPlayer1());
         System.out.println(this.session.getPlayer2());
+
+        Message msgResponseStartP1 = new Message();
+        msgResponseStartP1.setAction("START");
+        this.session.getPlayer1().getOut().reset();
+        this.session.getPlayer1().getOut().writeObject(msgResponseStartP1);
 
 
         return msgResponseConnect;
