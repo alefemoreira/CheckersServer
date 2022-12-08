@@ -145,14 +145,6 @@ public class Session {
     return table;
   }
 
-  public Semaphore getWait() {
-    return wait;
-  }
-
-  public Semaphore getWait2() {
-    return wait2;
-  }
-
   public boolean isBlackRound() {
     return blackRound;
   }
