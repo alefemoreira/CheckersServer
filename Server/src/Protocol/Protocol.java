@@ -26,8 +26,6 @@ public class Protocol {
           throws IllegalArgumentException, InvalidSession, NonExistentPiece, IOException, InterruptedException {
     if (message.getAction().length() == 0) throw new IllegalArgumentException();
 
-//    String[] data = message.split(" ");
-
     switch (message.getAction()) {
       case "CREATE_SESSION":
         Color color = Color.WHITE;
@@ -63,52 +61,37 @@ public class Protocol {
         msgQuit.setAction("QUIT");
         return msgQuit;
       case "CONNECT_SESSION":
+        // Segudno jogador conectando a sala
         this.session = Session.find(message.getCodeSession());
         this.session.addPlayer2(this.socket, out, in);
         Message msgResponseConnect = new Message();
         msgResponseConnect.setAction("START");
-        msgResponseConnect.setColor("BLACK");
+        msgResponseConnect.setColor("BLACK"); // Cor padrão do player que se conecta em uma sala
         msgResponseConnect.setCodeSession(message.getCodeSession());
 
 
-        System.out.println(this.session.getPlayer1());
-        System.out.println(this.session.getPlayer2());
+//        System.out.println(this.session.getPlayer1());
+//        System.out.println(this.session.getPlayer2());
 
+        // Notificando ao player que criou a sala para proseguir para a tela do jogo
         Message msgResponseStartP1 = new Message();
         msgResponseStartP1.setAction("START");
         this.session.getPlayer1().getOut().reset();
         this.session.getPlayer1().getOut().writeObject(msgResponseStartP1);
 
-
         return msgResponseConnect;
 
-      case "WAIT_MOVE":
-//        this.session.getWait2().acquire();
-        while (this.session.isBlackRound() && message.getColor().equals("WHITE") || !this.session.isBlackRound() && message.getColor().equals("BLACK")){
-          System.out.println("waiting...");
-        }
-
-        System.out.println("Entregando tabuleiro");
-        this.session = Session.find(message.getCodeSession());
-        Message msgMoveResponseWait = new Message();
-        Table tableWait = this.session.getTable();
-        msgMoveResponseWait.setTable(tableWait);
-//        this.session.wait.release();
-
-          return msgMoveResponseWait;
-
       case "MOVE":
-//        this.session.wait.acquire();
-//        int pieceId = Integer.parseInt(data[2]);
 
-        System.out.println("Vez do preto:" + this.session.isBlackRound());
-
-        if (this.session.isBlackRound() && message.getColor().equals("WHITE") || !this.session.isBlackRound() && message.getColor().equals("BLACK")) {
+        System.out.println("Vez do preto:" + this.session.getTable().isBlackRound());
+        // Jogador fez a jogada no turno errado
+        if (this.session.getTable().isBlackRound() && message.getColor().equals("WHITE") || !this.session.getTable().isBlackRound() && message.getColor().equals("BLACK")) {
           Message msgMoveResponse = new Message();
           msgMoveResponse.setAction("WRONG_TURN");
           return msgMoveResponse;
         }
 
+        // Definindo qual player fez a jogada(player1) e qual player vai receber o tabuleiro(player2)
         Player player1;
         Player player2;
 
@@ -138,14 +121,10 @@ public class Protocol {
         out2.writeObject(msgMoveResponse);
         player2.getOut().reset();
 
-        // Nofificando o player que fez a jogada
         System.out.println(table);
-//        this.session.wait.release();
 
-//        this.session.getWait2().release();
-
-        // Mudando o turno
-        this.session.setBlackRound(!this.session.isBlackRound());
+        // Mudando o turno, só muda o turno da sala se o turno do tabuleiro mudar
+//        this.session.setBlackRound(this.session.getTable().isBlackRound());
 
         return msgMoveResponse;
 

@@ -34,7 +34,7 @@ public class GameServer implements Runnable {
           Message response = protocol.processLine(message, out, in);
           System.out.println("sala: " + response.getCodeSession() + " " + response.getAction() +  " " + response.getTable());
           out.writeObject(response);
-          out.reset();
+          out.reset(); // Limpando o stream
           if (response.equals("BYE")) break;
         } catch (Exception ignore) {
           // break;
