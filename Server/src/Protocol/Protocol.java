@@ -61,8 +61,15 @@ public class Protocol {
         msgQuit.setAction("QUIT");
         return msgQuit;
       case "CONNECT_SESSION":
-        // Segudno jogador conectando a sala
+        // Segundo jogador conectando a sala
         this.session = Session.find(message.getCodeSession());
+
+        if (this.session == null) {
+          Message notFoundSessionmsg = new Message();
+          notFoundSessionmsg.setAction("NOT_FOUND_SESSION");
+          return notFoundSessionmsg;
+        }
+
         this.session.addPlayer2(this.socket, out, in);
         Message msgResponseConnect = new Message();
         msgResponseConnect.setAction("START");
@@ -114,7 +121,6 @@ public class Protocol {
         Message msgMoveResponse = new Message();
         msgMoveResponse.setAction("SUCCESS_MOVE");
         msgMoveResponse.setTable(table);
-        msgMoveResponse.setSquare(table.getSquare(message.getDestinoX(), message.getDestinoY()));
 
         // Notificando o outro player sobre a jogada
         ObjectOutputStream out2 = player2.getOut();
