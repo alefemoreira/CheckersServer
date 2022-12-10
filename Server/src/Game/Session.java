@@ -85,7 +85,7 @@ public class Session {
 
     Square origem = this.table.getSquare(origemX, origemY);
     Square destino = this.table.getSquare(destinoX, destinoY);
-    Pawn peca = (Pawn) origem.getPiece();
+    Piece peca = (Piece) origem.getPiece();
     peca.mover(destino, this.table);
 
     return this.table;
