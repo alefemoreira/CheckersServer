@@ -27,7 +27,7 @@ public abstract class Piece implements Serializable {
    * Movimenta a peca para uma nova casa.
    * @param destino nova casa que ira conter esta peca.
    */
-  public void mover(Square destino, Table tabuleiro) {
+  public void mover(Square destino, Table tabuleiro) throws RuntimeException {
 
     System.out.println(this.couldMove(destino, tabuleiro));
     if(this.couldMove(destino, tabuleiro)) {
@@ -72,6 +72,8 @@ public abstract class Piece implements Serializable {
 
       // Só troca o turno se a peça não tiver capturado outra
 
+    } else {
+      throw new RuntimeException("Invalid Movment");
     }
   }
 

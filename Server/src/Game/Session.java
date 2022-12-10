@@ -77,7 +77,7 @@ public class Session {
     this.player2.getSocket().close();
   }
 
-  public Table move(Player player, int origemX, int origemY, int destinoX, int destinoY) {
+  public Table move(Player player, int origemX, int origemY, int destinoX, int destinoY) throws RuntimeException {
 //    System.out.println(origemX);
 //    System.out.println(origemY);
 //    System.out.println(destinoX);
