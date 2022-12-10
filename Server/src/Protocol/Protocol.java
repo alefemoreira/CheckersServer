@@ -28,11 +28,8 @@ public class Protocol {
 
     switch (message.getAction()) {
       case "CREATE_SESSION":
+        // Cor padrão do player que cria a sala
         Color color = Color.WHITE;
-
-
-//        if (message.getColor().equals("BLACK"))
-//          color = Color.BLACK;
 
         this.session = Session.create(socket, color, out, in);
 
@@ -46,6 +43,7 @@ public class Protocol {
         Session.printSessions();
         Session.add(code, this.session);
 
+        // Retornando o código da sala para o usuário
         Message msgResponse = new Message();
         msgResponse.setCodeSession(code);
         msgResponse.setColor("WHITE");
@@ -64,12 +62,14 @@ public class Protocol {
         // Segundo jogador conectando a sala
         this.session = Session.find(message.getCodeSession());
 
+        // O servidor não achou a sala
         if (this.session == null) {
           Message notFoundSessionmsg = new Message();
           notFoundSessionmsg.setAction("NOT_FOUND_SESSION");
           return notFoundSessionmsg;
         }
 
+        // Notificando ou player que se conectou com a sala
         this.session.addPlayer2(this.socket, out, in);
         Message msgResponseConnect = new Message();
         msgResponseConnect.setAction("START");
@@ -83,7 +83,7 @@ public class Protocol {
         // Notificando ao player que criou a sala para proseguir para a tela do jogo
         Message msgResponseStartP1 = new Message();
         msgResponseStartP1.setAction("START");
-        this.session.getPlayer1().getOut().reset();
+        this.session.getPlayer1().getOut().reset(); // Resetando a streamd de dados
         this.session.getPlayer1().getOut().writeObject(msgResponseStartP1);
 
         return msgResponseConnect;
