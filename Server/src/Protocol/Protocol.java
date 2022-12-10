@@ -114,25 +114,31 @@ public class Protocol {
 
         System.out.println( message.getOrigemX() + " " + message.getOrigemY() + " " + message.getDestinoX() + " " + message.getDestinoY());
 
-        // Movendo o tabuleiro do servidor
-        Table table = this.session.move(player1, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
+        try {
+          // Movendo o tabuleiro do servidor
+          Table table = this.session.move(player1, message.getOrigemX(), message.getOrigemY(), message.getDestinoX(), message.getDestinoY());
 
-        // Messangem de retorno para os clientes
-        Message msgMoveResponse = new Message();
-        msgMoveResponse.setAction("SUCCESS_MOVE");
-        msgMoveResponse.setTable(table);
+          // Messangem de retorno para os clientes
+          Message msgMoveResponse = new Message();
+          msgMoveResponse.setAction("SUCCESS_MOVE");
+          msgMoveResponse.setTable(table);
 
-        // Notificando o outro player sobre a jogada
-        ObjectOutputStream out2 = player2.getOut();
-        out2.writeObject(msgMoveResponse);
-        player2.getOut().reset();
+          // Notificando o outro player sobre a jogada
+          ObjectOutputStream out2 = player2.getOut();
+          out2.writeObject(msgMoveResponse);
+          player2.getOut().reset();
 
-        System.out.println(table);
+          System.out.println(table);
 
-        // Mudando o turno, só muda o turno da sala se o turno do tabuleiro mudar
+          // Mudando o turno, só muda o turno da sala se o turno do tabuleiro mudar
 //        this.session.setBlackRound(this.session.getTable().isBlackRound());
 
-        return msgMoveResponse;
+          return msgMoveResponse;
+        } catch (RuntimeException e){
+          Message msgMoveResponse = new Message();
+          msgMoveResponse.setAction("WRONG_MOVEMENT");
+          return msgMoveResponse;
+        }
 
       default:
       throw new IllegalArgumentException();
